@@ -23,6 +23,90 @@ Il s’agit d’une démonstration simple permettant une **comparaison côte à 
 L’inférence de détection d’objets et de segmentation est réalisée avec **YOLO (Ultralytics)** et **RF-DETR (rfdetr)**. Les résultats sont exportés sous forme d’images annotées afin d’observer rapidement les différences entre les boîtes englobantes et la qualité de segmentation.
 
 
+## Demo
+
+### RF-DETR
+
+```
+import requests
+import supervision as sv
+import matplotlib.pyplot as plt
+from PIL import Image
+from io import BytesIO
+from rfdetr import RFDETRSegMedium
+from rfdetr.assets.coco_classes import COCO_CLASSES
+
+model = RFDETRSegMedium()
+
+url = "https://ultralytics.com/images/bus.jpg"
+response = requests.get(url, timeout=30)
+response.raise_for_status()
+
+image = Image.open(BytesIO(response.content)).convert("RGB")
+detections = model.predict(image, threshold=0.5)
+
+labels = [COCO_CLASSES[class_id] for class_id in detections.class_id]
+
+mask_annotator = sv.MaskAnnotator()
+label_annotator = sv.LabelAnnotator()
+
+annotated_image = mask_annotator.annotate(image.copy(), detections)
+annotated_image = label_annotator.annotate(annotated_image, detections, labels)
+
+plt.figure(figsize=(12, 8))
+plt.imshow(annotated_image)
+plt.axis("off")
+plt.show()
+
+annotated_image.save("rfdetr_result.png")
+print("Saved: rfdetr_result.png")
+```
+
+### YOLO
+
+```
+import requests
+import matplotlib.pyplot as plt
+from io import BytesIO
+from PIL import Image
+from ultralytics import YOLO
+
+# Load model
+model = YOLO("yolo26n-seg.pt")
+# model = YOLO("path/to/best.pt")  # load a custom model
+
+# Download image
+url = "https://ultralytics.com/images/bus.jpg"
+response = requests.get(url, timeout=30)
+response.raise_for_status()
+image = Image.open(BytesIO(response.content)).convert("RGB")
+
+# Predict
+results = model.predict(source=image)
+
+# Show and save results
+for i, result in enumerate(results):
+    annotated_image = result.plot()
+
+    plt.figure(figsize=(12, 8))
+    plt.imshow(annotated_image)
+    plt.axis("off")
+    plt.show()
+
+    Image.fromarray(annotated_image[..., ::-1]).save(f"yolo_result_{i}.png")
+    print(f"Saved: yolo_result_{i}.png")
+
+    if result.masks is not None:
+        xy = result.masks.xy
+        xyn = result.masks.xyn
+        masks = result.masks.data
+
+        print("Number of objects:", len(xy))
+        print("Mask tensor shape:", masks.shape)
+    else:
+        print("No masks found.")
+```
+
 ## 重點特性
 
 - YOLO：使用 `yolo26n-seg.pt` 做影像推論，並把結果存成 `yolo_result_{i}.png`
