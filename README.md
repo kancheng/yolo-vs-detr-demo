@@ -107,24 +107,63 @@ for i, result in enumerate(results):
         print("No masks found.")
 ```
 
-## 重點特性
+## Demo 結果（範例輸出）Demo Results (Example Output)
+
+以下圖片是把同一張示範影像進行推論後，把結果輸出到 `img/` 資料夾中的範例：
+
+The following images are examples of outputting the results of inferences from the same demo image to the `img/` folder:
+
+### 輸入影像 Input Image
+
+![demo input - bus](img/bus.jpg)
+
+### RF-DETR 結果 Results
+
+![RF-DETR result](img/rfdetr_result.png)
+
+RF-DETR 的輸出會呈現分割遮罩（mask）與分類標籤，方便觀察模型在同一張影像上的分割輪廓表現。
+
+RF-DETR output presents a segmentation mask and classification labels, making it easy to observe the model's segmentation contour performance on the same image.
+
+### YOLO 結果 Results
+
+![YOLO result](img/yolo_result_0.png)
+
+YOLO 的輸出同樣包含分割遮罩與標籤/可視化結果，讓你可以和 RF-DETR 做逐圖對照。
+
+YOLO output also includes a segmentation mask and label/visualization results, allowing you to compare it image-by-image with RF-DETR.
+
+
+## 重點特性 Features
 
 - YOLO：使用 `yolo26n-seg.pt` 做影像推論，並把結果存成 `yolo_result_{i}.png`
 - RF-DETR：使用 `RFDETRSegMedium()` 做影像推論（`threshold=0.5`），並把結果存成 `rfdetr_result.png`
 - 兩者都會從同一張示範影像 `https://ultralytics.com/images/bus.jpg` 進行推論
+
+- YOLO: Uses `yolo26n-seg.pt` for image inference and saves the result as `yolo_result_{i}.png`
+
+- RF-DETR: Uses `RFDETRSegMedium()` for image inference (`threshold=0.5`) and saves the result as `rfdetr_result.png`
+
+- Both inferences are performed from the same sample image `https://ultralytics.com/images/bus.jpg`
 
 ## 環境需求
 
 - Python（建議 3.8+）
 - 套件（以 notebook 內容為準）
 
-### 安裝
+## Environment Requirements
+
+- Python (3.8+ recommended)
+- Packages (based on notebook content)
+
+### 安裝 Installation
 
 ```bash
 pip install rfdetr ultralytics
 ```
 
 > 備註：`rfdetr` 依賴 PyTorch（`torch>=2.2.0`）；若你尚未安裝 PyTorch，請依你的 CPU/GPU 環境先安裝相容版本的 `torch`。
+> Note: `rfdetr` depends on PyTorch (`torch>=2.2.0`); if you have not yet installed PyTorch, please install a compatible version of `torch` according to your CPU/GPU environment.
 
 ---
 
